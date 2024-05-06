@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <h1>Konfigurator zestawu komputerowego</h1>
+    <h3 style="text-align: center;"> Wybierz komponenty i sprawdź, czy dana konfiguracja będzie działać</h3>
+    <select id="lista-plyta">
+        <option value="" disabled selected>Wybierz płytę główną</option>
+    </select>
+    <br>
+    <select id="lista-procesor">
+        <option value="" disabled selected>Wybierz procesor</option>
+    </select>
+    <br>
+    <select id="lista-ram">
+        <option value="" disabled selected>Wybierz pamięć RAM</option>
+    </select>
+    <br>
+    <select id="lista-grafika">
+        <option value="" disabled selected>Wybierz kartę graficzną</option>
+    </select>
+    <br> <br>
+    <button id="uruchom-konfigurator">Wybierz Komponenty</button>
+
+    <script>
+        var plyta_socket;
+        var plyta_ddr;
+        var plyta_slotyram;
+        var plyta_taktowanieram;
+        var plyta_maxram;
+
+        // Procesor
+        var procesor_socket;
+        var procesor_ddr;
+        var procesor_grafika;
+
+        // RAM
+        var ram_ddr;
+        var ram_taktowanieram;
+        var ram_slotyram;
+        var ram_rozmiarram;
+
+        // Karta Graficzna
+        var karta_grafika;
+
+        // Obrazki
+        var obrazek_cpu;
+        var obrazek_ram;
+        var obrazek_gpu;
+
+        var plytaWybor;
+        var procesorWybor;
+        var ramWybor;
+        var grafikaWybor;
+
+        var url_plyta;
+        var url_procesor;
+        var url_ram;
+        var url_karta;
+
+
+        // Funkcja do pobierania i wyświetlania wybranych wartości komponentów
+        function displaySelectedComponents() {
+            // Wyczyść konsolę
+            console.clear();
+
+            var plytaWybor = document.getElementById('lista-plyta').value;
+            var procesorWybor = document.getElementById('lista-procesor').value;
+            var ramWybor = document.getElementById('lista-ram').value;
+            var grafikaWybor = document.getElementById('lista-grafika').value;
+
+            console.log("Płyta główna: " + plytaWybor);
+            console.log("Procesor: " + procesorWybor);
+            console.log("Pamięć RAM: " + ramWybor);
+            console.log("Karta graficzna: " + grafikaWybor);
+        }
+
+        // Pobierz dane - płyty główne
+        fetch('https://localhost:7164/plyty_glowne')
+        .then(response => response.json())
+        .then(data => {
+            const selectElement = document.getElementById('lista-plyta');
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.plyta_id;
+                option.textContent = item.plyta_nazwa;
+                selectElement.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+
+        // Pobierz dane - procesory
+        fetch('https://localhost:7164/procesory')
+        .then(response => response.json())
+        .then(data => {
+            const selectElement = document.getElementById('lista-procesor');
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.procesor_id;
+                option.textContent = item.procesor_nazwa;
+                selectElement.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+
+        // Pobierz dane - pamięci RAM
+        fetch('https://localhost:7164/ram')
+        .then(response => response.json())
+        .then(data => {
+            const selectElement = document.getElementById('lista-ram');
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.ram_id;
+                option.textContent = item.ram_nazwa;
+                selectElement.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+
+        // Pobierz dane - karta graficzna
+        fetch('https://localhost:7164/karty_graficzne')
+        .then(response => response.json())
+        .then(data => {
+            const selectElement = document.getElementById('lista-grafika');
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.karta_id;
+                option.textContent = item.karta_nazwa;
+                selectElement.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+
+        // Funkcja do pobierania i wyświetlania wybranych wartości komponentów
+        function displaySelectedComponents() {
+            // Wyczyść konsolę
+            console.clear();
+
+            plytaWybor = document.getElementById('lista-plyta').value;
+            procesorWybor = document.getElementById('lista-procesor').value;
+            ramWybor = document.getElementById('lista-ram').value;
+            grafikaWybor = document.getElementById('lista-grafika').value;
+
+            console.log("Płyta główna: " + plytaWybor);
+            console.log("Procesor: " + procesorWybor);
+            console.log("Pamięć RAM: " + ramWybor);
+            console.log("Karta graficzna: " + grafikaWybor);
+
+            // pobieranie danych konkretnych 
+
+            //płyta główna
+            url_plyta = 'https://localhost:7164/plyty_glowne/' + plytaWybor;
+                fetch(url_plyta)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Przypisz wartości do zmiennych na podstawie pobranych danych
+                        plyta_socket = data[0].plyta_socket;
+                        plyta_ddr = data[0].plyta_ddr;
+                        plyta_slotyram = data[0].plyta_slotyram;
+                        plyta_taktowanieram = data[0].plyta_taktowanieram;
+                        plyta_maxram = data[0].plyta_maxram;
+                    })
+                    .catch(error => console.error('Error fetching component data:', error));
+
+            //procesor
+            url_procesor = 'https://localhost:7164/procesory/' + procesorWybor;
+                fetch(url_procesor)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Przypisz wartości do zmiennych na podstawie pobranych danych
+                        procesor_socket = data[0].procesor_socket;
+                        procesor_ddr = data[0].procesor_ddr;
+                        procesor_grafika = data[0].procesor_grafika;
+                    })
+                    .catch(error => console.error('Error fetching component data:', error));
+
+            //RAM
+            url_ram = 'https://localhost:7164/ram/' + ramWybor;
+                fetch(url_ram)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Przypisz wartości do zmiennych na podstawie pobranych danych
+                        ram_ddr = data[0].ram_ddr;
+                        ram_taktowanieram = data[0].ram_taktowanie;
+                        ram_slotyram = data[0].ram_slotyram;
+                        ram_rozmiarram = data[0].ram_rozmiar;
+                    })
+                    .catch(error => console.error('Error fetching component data:', error));
+
+            //karta graficzna
+            url_karta = 'https://localhost:7164/karty_graficzne/' + grafikaWybor;
+                fetch(url_karta)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Przypisz wartości do zmiennych na podstawie pobranych danych
+                        karta_grafika= data[0].karta_grafika;
+                    })
+                    .catch(error => console.error('Error fetching component data:', error));
+        }
+
+        // Nasłuchuj na kliknięcie przycisku i wywołaj funkcję do wyświetlania wybranych komponentów
+        document.getElementById('uruchom-konfigurator').addEventListener('click', function() {
+            displaySelectedComponents();
+        });
+        
+
+        function porownajZmienne() {
+
+        // Warunek 1
+        if (plyta_socket === procesor_socket) {
+            document.getElementById('grafika').src = 'cpu_green.png';
+        } else {
+            document.getElementById('grafika').src = 'cpu_red.png';
+        }
+
+        // Warunek 2
+        if (
+            plyta_ddr === procesor_ddr &&
+            plyta_ddr === ram_ddr &&
+            plyta_slotyram >= ram_slotyram &&
+            plyta_taktowanieram === ram_taktowanieram &&
+            plyta_maxram >= ram_rozmiarram
+        ) {
+            document.getElementById('grafika2').src = 'ram_green.png';
+        } else {
+            document.getElementById('grafika2').src = 'ram_red.png';
+        }
+
+        // Warunek 3
+        if (procesor_grafika + karta_grafika > 0) {
+            document.getElementById('grafika3').src = 'gpu_green.png';
+        } else {
+            document.getElementById('grafika3').src = 'gpu_red.png';
+        }
+        }
+
+</script>
+
+<button onclick="porownajZmienne()">Porównaj</button>
+<br>
+<img id="grafika" src="" alt="Grafika" width="200" height="200">
+<img id="grafika2" src="" alt="Grafika" width="200" height="200">
+<img id="grafika3" src="" alt="Grafika" width="200" height="200">
+
+
+
+</body>
+</html>
+
